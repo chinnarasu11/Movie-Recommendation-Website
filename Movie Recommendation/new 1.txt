@@ -1,0 +1,107 @@
+<?php
+require 'database.php';
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .movie-container {
+            width: 300px;
+            margin: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .movie-container img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .movie-container video {
+            width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+
+        hr {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+    </style>
+    <title>Movie Details</title>
+</head>
+<body>
+
+<?php
+// Create connection
+$conn = Connect();
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Retrieve movie details from the database
+$sql = "SELECT * FROM movies";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    // Output data of each row
+    $count = 0;
+    while ($row = $result->fetch_assoc()) {
+        // Start a new row after every 3 movies
+        if ($count % 3 == 0 && $count != 0) {
+            echo '<br>';
+        }
+
+        // Movie container
+        echo '<div class="movie-container">';
+        echo "<strong>Movie Name:</strong> " . $row["movie_name"] . "<br>";
+        echo "<strong>Director:</strong> " . $row["movie_dir"] . "<br>";
+        echo "<strong>Hero:</strong> " . $row["movie_hero"] . "<br>";
+        echo "<strong>Heroine:</strong> " . $row["movie_herione"] . "<br>";
+        echo "<strong>Year:</strong> " . $row["movie_year"] . "<br>";
+
+        // Display image
+        $imagePath = 'pic/' . $row["image_filename"];
+        if (file_exists($imagePath)) {
+            echo '<img src="' . $imagePath . '" alt="Movie Image"><br>';
+        } else {
+            echo 'Image not found!<br>';
+        }
+
+        // Display video
+        $videoPath = 'pic/' . $row["video_filename"];
+        if (file_exists($videoPath)) {
+            echo '<video width="320" height="240" controls>';
+            echo '<source src="' . $videoPath . '" type="video/mp4">';
+            echo 'Your browser does not support the video tag.';
+            echo '</video><br>';
+        } else {
+            echo 'Video not found!<br>';
+        }
+
+        echo '</div>';
+        echo "<hr>";
+        $count++;
+    }
+} else {
+    echo "No records found";
+}
+
+// Close connection
+$conn->close();
+?>
+
+</body>
+</html>

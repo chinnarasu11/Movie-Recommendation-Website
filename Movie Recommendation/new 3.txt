@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details</title>
+    <style>
+        #max {
+            margin: auto;
+            max-width: 1200px; /* Set a maximum width for the container */
+        }
+
+        .movie-container {
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+            text-align: center;
+            width: calc(33.33% - 20px); /* 3 containers in a row with 10px margin on each side */
+            float: left;
+            cursor: pointer;
+            height: 800px; /* Set a fixed height for the container */
+        }
+
+        .movie-container img {
+            width: 75%; /* Make the image fill the container */
+            height: 75%; /* Make the image fill the container height */
+            object-fit: cover; /* Maintain the aspect ratio and cover the container */
+        }
+
+        .movie-details {
+            clear: both; /* Clear the float to ensure proper alignment */
+            text-align: center;
+        }
+
+        .submit {
+            margin-top: 10px;
+            display: block;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<?php
+require 'database.php';
+$conn = Connect();
+
+// Fetch all details from the database
+$query = "SELECT * FROM movieinfo";
+$result = $conn->query($query);
+
+// Check if there are rows in the result
+if ($result->num_rows > 0) {
+    $counter = 0; // Counter to keep track of movies
+
+    while ($row = $result->fetch_assoc()) {
+        $movie_name = $row['movie_name'];
+        $movie_dir = $row['movie_dir'];
+        $movie_hero = $row['movie_hero'];
+        $movie_herione = $row['movie_herione'];
+        $movie_year = $row['movie_year'];
+        $car_img = $row['car_img'];
+
+        // Open a new row div for every 3 movies
+        if ($counter % 3 == 0) {
+            echo "<div class='row'>";
+        }
+
+        echo "<div class='movie-container' onclick='showMovieDetails(\"$movie_name\", \"$movie_dir\", \"$movie_hero\", \"$movie_herione\", \"$movie_year\", \"$car_img\")'>
+                <h3>$movie_name</h3>
+                <img src='$car_img' alt='$movie_name'>
+                <p>Director: $movie_dir</p>
+                <p>Hero: $movie_hero</p>
+                <p>Heroine: $movie_herione</p>
+                <p>Year: $movie_year</p>
+              </div>";
+
+        // Close the row div after every 3 movies
+        if ($counter % 3 == 2) {
+            echo "</div>";
+        }
+
+        $counter++;
+    }
+
+    // Close the row div if the number of movies is not a multiple of 3
+    if ($counter % 3 != 0) {
+        echo "</div>";
+    }
+
+    echo "<div class='movie-details'>
+        <a href='add_information.php'><button type='submit' id='submit' name='submit' class='submit'>Back to Form</button></a>
+    </div>";
+} else {
+    // Handle no data found case
+    echo "<p>No movie details found</p>";
+}
+
+$conn->close();
+?>
+
+<script>
+    function showMovieDetails(name, director, hero, heroine, year, image) {
+        // Redirect to another page with additional details
+        window.location.href = 'movie_details.php?name=' + encodeURIComponent(name) +
+            '&director=' + encodeURIComponent(director) +
+            '&hero=' + encodeURIComponent(hero) +
+            '&heroine=' + encodeURIComponent(heroine) +
+            '&year=' + encodeURIComponent(year) +
+            '&image=' + encodeURIComponent(image);
+    }
+</script>
+
+</body>
+</html>
